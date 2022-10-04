@@ -1,4 +1,15 @@
 #include <Arduino.h>
+#include <BluetoothSerial.h>
+
+#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+#endif
+
+#if !defined(CONFIG_BT_SPP_ENABLED)
+#error Serial Bluetooth not available or not enabled. It is only available for the ESP32 chip.
+#endif
+
+BluetoothSerial SerialBT;
 
 void setup() {
   int pot1_pin;
@@ -11,10 +22,19 @@ void setup() {
   int servo1_pos = 0;
   int servo2_pos = 0;
 
-  
-  // put your setup code here, to run once:
+  Serial.begin(115200);
+  SerialBT.begin("ESP32test");
+  Serial.println("The device started, now you can pair it with bluetooth!");  // put your setup code here, to run once:
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  if (Serial.available()) {
+    int ch = Serial.read();
+    Serial.write(ch);
+    SerialBT.write(ch);
+  }
+  if (SerialBT.available()) {
+    Serial.write(SerialBT.read());
+  }
+  delay(20);
 }
