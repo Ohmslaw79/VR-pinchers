@@ -1,16 +1,16 @@
 #include <Arduino.h>
-#include <BluetoothSerial.h>
+// #include <BluetoothSerial.h>
 #include <Servo.h>
 
-#if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
-#error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
-#endif
+// #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
+// #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
+// #endif
 
-#if !defined(CONFIG_BT_SPP_ENABLED)
-#error Serial Bluetooth not available or not enabled. It is only available for the ESP32 chip.
-#endif
+// #if !defined(CONFIG_BT_SPP_ENABLED)
+// #error Serial Bluetooth not available or not enabled. It is only available for the ESP32 chip.
+// #endif
 
-BluetoothSerial SerialBT;
+// BluetoothSerial SerialBT;
 
 int finger_num = 2;
 
@@ -48,9 +48,8 @@ void read_POT(int POT, finger *f){
 
 void setup() {
 
-
   Serial.begin(115200);
-  SerialBT.begin("ESP32test");
+  // SerialBT.begin("ESP32test");
   pinMode(BUTTON, INPUT_PULLUP);  // Pull Up Resistance
 
   for(int i = 0; i < finger_num - 1; i++){
@@ -70,7 +69,7 @@ void loop() {
     for(int i = 0; i < finger_num - 1; i++){
       finger_mem[i]->POS_base = analogRead(POT[i]);    
       finger_mem[i]->POS_diff = 0;
-      finger_mem[i]->servo.writeMicroseconds(1000);
+      finger_mem[i]->servo.writeMicroseconds(2000);
       Serial.println(finger_mem[i]->POS_base);
     }
 
@@ -79,10 +78,12 @@ void loop() {
     
   }else{
     for(int i = 0; i < finger_num - 1; i++){
-      finger_mem[i]->POS_base = analogRead(POT[i]);    
+      read_POT(POT[i], finger_mem[i]);
+      Serial.println(finger_mem[i]->POS_diff);
     }
   }
   // if (Serial.available()) {
+    
   //   int ch = Serial.read();
   //   Serial.write(ch);
   //   SerialBT.write(ch);
