@@ -70,7 +70,7 @@ void loop() {
     Serial.println("Position Reset");
     SerialBT.println("Position Reset");
 
-    for(int i = 1; i < finger_num; i++){
+    for(int i = 0; i < finger_num; i++){
       finger_mem[i]->POS_base = analogRead(POT[i]);    
       finger_mem[i]->POS_diff = 0;
       finger_mem[i]->servo.writeMicroseconds(1000);
@@ -87,7 +87,7 @@ void loop() {
     last_button_time = button_time;
     
   }else{
-    for(int i = 1; i < finger_num; i++){
+    for(int i = 0; i < finger_num; i++){
       read_POT(POT[i], finger_mem[i]);
       Serial << i << ":" << finger_mem[i]->POS_diff;
       Serial.println();
