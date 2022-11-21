@@ -26,10 +26,10 @@ unsigned long last_button_time = 0;
 
 struct finger {
     Servo servo;
-    int POS_base;
-    int POS_diff;
-    int last_pot_pos;
-    int cur_pot_pos;
+    int POS_base;     //Starting poition (?)
+    int POS_diff;     //Change in position
+    int last_pot_pos; //Previous position
+    int cur_pot_pos;  //Current position
 };
 
 int finger_num = 2;
@@ -46,7 +46,7 @@ void read_POT(int POT, finger *f){
     if(f->POS_diff > 1000){
         f->servo.writeMicroseconds(1800);
     }else{
-        f->servo.writeMicroseconds(1000);
+        f->servo.writeMicroseconds(2000);
     }
 }
 
@@ -62,6 +62,8 @@ void setup() {
 
   Serial.println("ESP32 running :)");
 }
+int tog = 0;
+int togLim = 7;
 
 void loop() {
   button_time = millis();
@@ -70,14 +72,18 @@ void loop() {
     Serial.println("Position Reset");
     SerialBT.println("Position Reset");
 
+
     for(int i = 0; i < finger_num; i++){
       finger_mem[i]->POS_base = analogRead(POT[i]);    
       finger_mem[i]->POS_diff = 0;
-      finger_mem[i]->servo.writeMicroseconds(1000);
+      finger_mem[i]->servo.writeMicroseconds(2000);
+
+   
       Serial << i << ":" << finger_mem[i]->POS_diff;
       Serial.println();
-
       SerialBT << i << ":" << finger_mem[i]->POS_diff;
+    
+      
       
     }
 
@@ -87,13 +93,18 @@ void loop() {
     last_button_time = button_time;
     
   }else{
-    for(int i = 0; i < finger_num; i++){
-      read_POT(POT[i], finger_mem[i]);
-      Serial << i << ":" << finger_mem[i]->POS_diff;
-      Serial.println();
 
-      SerialBT << i << ":" << finger_mem[i]->POS_diff;
-      SerialBT.println();
+    tog++;
+    for(int i = 0; i < finger_num; i++){
+
+      if(tog%togLim == 0  ){
+        read_POT(POT[i], finger_mem[i]);
+        Serial << i << ":" << finger_mem[i]->POS_diff;
+        Serial.println();
+        SerialBT << i << ":" << finger_mem[i]->POS_diff;
+        SerialBT.println();
+        tog = 0; 
+      }
 
     }
   }
