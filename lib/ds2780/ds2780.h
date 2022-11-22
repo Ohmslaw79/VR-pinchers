@@ -49,4 +49,6 @@
 #define EEPROM_FRSGAIN_MSB 7B
 #define EEPROM_FRSGAIN_LSB 7C
 
+
+
 #endif /* DS2780_H_ */
