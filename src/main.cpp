@@ -11,18 +11,12 @@
 #error Serial Bluetooth not available or not enabled. It is only available for the ESP32 chip.
 #endif
 
+#define DEBOUNCE_TIME 200
+
+
 template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg); return obj; }
 
 BluetoothSerial SerialBT;
-
-int POT[] =  {4,5};
-int servoPin[] = {37,36};
-
-int BUTTON = 28;
-int reset_flag = 0;
-
-unsigned long button_time = 0;  //button debouncing var
-unsigned long last_button_time = 0; 
 
 struct finger {
     Servo servo;
@@ -32,12 +26,6 @@ struct finger {
     int cur_pot_pos;  //Current position
 };
 
-int finger_num = 2;
-
-finger f1, f2;
-
-struct finger *finger_mem[] = {&f1, &f2};
-
 void read_POT(int POT, finger *f){
     f->cur_pot_pos = analogRead(POT);
     f->POS_diff = f->cur_pot_pos - f->POS_base;
@@ -46,9 +34,32 @@ void read_POT(int POT, finger *f){
     if(f->POS_diff > 1000){
         f->servo.writeMicroseconds(1800);
     }else{
-        f->servo.writeMicroseconds(2000);
+        f->servo.writeMicroseconds(2000); 
     }
 }
+
+void print(String s){
+  Serial.println(s);
+  SerialBT.println(s);
+}
+
+int finger_num = 1;
+
+int POT[] =  {36,39,34,35,32};
+int servoPin[] = {23,22,21,19,18};
+
+finger f1, f2;
+struct finger *finger_mem[] = {&f1, &f2};
+
+int BUTTON = 17;
+int reset_flag = 0;
+
+unsigned long button_time = 0;  //button debouncing var
+unsigned long last_button_time = 0;
+
+int tog = 0;
+int togLim = 7;
+
 
 void setup() {
 
@@ -62,12 +73,10 @@ void setup() {
 
   Serial.println("ESP32 running :)");
 }
-int tog = 0;
-int togLim = 7;
 
 void loop() {
   button_time = millis();
-  if(digitalRead(BUTTON) == 0  & (button_time - last_button_time > 200)){ //*Reset POS if button is pressed (incl. debounce)
+  if(digitalRead(BUTTON) == LOW && (button_time - last_button_time > DEBOUNCE_TIME)){ //*Reset POS if button is pressed (incl. debounce)
     
     Serial.println("Position Reset");
     SerialBT.println("Position Reset");
@@ -82,7 +91,6 @@ void loop() {
       Serial << i << ":" << finger_mem[i]->POS_diff;
       Serial.println();
       SerialBT << i << ":" << finger_mem[i]->POS_diff;
-      
     }
 
     reset_flag = 1;
