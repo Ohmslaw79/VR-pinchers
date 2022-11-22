@@ -15,10 +15,10 @@ template<class T> inline Print &operator <<(Print &obj, T arg) { obj.print(arg);
 
 BluetoothSerial SerialBT;
 
-int POT[] =  {34,33};
-int servoPin[] = {12,13};
+int POT[] =  {4,5};
+int servoPin[] = {37,36};
 
-int BUTTON = 18;
+int BUTTON = 28;
 int reset_flag = 0;
 
 unsigned long button_time = 0;  //button debouncing var
@@ -67,7 +67,7 @@ int togLim = 7;
 
 void loop() {
   button_time = millis();
-  if(digitalRead(BUTTON)  & (button_time - last_button_time > 200)){ //*Reset POS if button is pressed (incl. debounce)
+  if(digitalRead(BUTTON) == 0  & (button_time - last_button_time > 200)){ //*Reset POS if button is pressed (incl. debounce)
     
     Serial.println("Position Reset");
     SerialBT.println("Position Reset");
@@ -82,8 +82,6 @@ void loop() {
       Serial << i << ":" << finger_mem[i]->POS_diff;
       Serial.println();
       SerialBT << i << ":" << finger_mem[i]->POS_diff;
-    
-      
       
     }
 
@@ -122,6 +120,7 @@ void loop() {
   // Recieve where to stop
   if (SerialBT.available()) {
     Serial.write(SerialBT.read());
+    
   }
 
   delay(20);
