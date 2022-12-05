@@ -13,42 +13,27 @@
 
 #define DEBOUNCE_TIME 200
 
-template <class T>
-inline Print &operator<<(Print &obj, T arg)
-{
-  obj.print(arg);
-  return obj;
-}
-
-BluetoothSerial SerialBT;
-
-struct finger
+struct Potentiometer{
+  int pin;
+  int pos;
+};
+struct Finger
 {
   Servo servo;
-  int servo_pos;    // Servo Position
-  int zero;
-  int max;
+  Potentiometer pot;
+  int zero;     // Finger flex 0%
+  int max;      // Finger flex 100%
 };
 
-void read_POT(int POT, finger *f)
-{
-  f->cur_pot_pos = analogRead(POT);
-  f->POS_diff = f->cur_pot_pos - f->POS_base;
-  delay(1);
-
-void print(String s)
-{
-  Serial.println(s);
-  SerialBT.println(s);
-}
+BluetoothSerial SerialBT;
 
 int finger_num = 2;
 
 int POT[] = {36, 39, 34, 35, 32};
 int servoPin[] = {23, 22, 21, 19, 18};
 
-finger f1, f2, f3, f4, f5;
-struct finger *finger_mem[] = {&f1, &f2, &f3, &f4, &f5};
+Finger f1, f2, f3, f4, f5;
+struct Finger *finger_mem[] = {&f1, &f2, &f3, &f4, &f5};
 
 int BUTTON = 17;
 int reset_flag = 0;
@@ -69,6 +54,7 @@ void setup()
   for (int i = 0; i < finger_num; i++)
   {
     finger_mem[i]->servo.attach(servoPin[i]);
+    finger_mem[i]->pot.pin = POT[i]
   }
 
   Serial.println("ESP32 running :)");
@@ -136,4 +122,9 @@ void loop()
   }
 
   delay(20);
+}
+
+void read_POT(Finger *finger)
+{
+  finger->pot.pos = analogRead(finger->pot.pin);
 }
