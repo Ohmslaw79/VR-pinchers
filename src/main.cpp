@@ -25,10 +25,9 @@ BluetoothSerial SerialBT;
 struct finger
 {
   Servo servo;
-  int POS_base;     // Starting poition (?)
-  int POS_diff;     // Change in position
-  int last_pot_pos; // Previous position
-  int cur_pot_pos;  // Current position
+  int servo_pos;    // Servo Position
+  int zero;
+  int max;
 };
 
 void read_POT(int POT, finger *f)
@@ -36,16 +35,6 @@ void read_POT(int POT, finger *f)
   f->cur_pot_pos = analogRead(POT);
   f->POS_diff = f->cur_pot_pos - f->POS_base;
   delay(1);
-  //* Remove below for BT compatability
-  if (f->POS_diff > 1000)
-  {
-    f->servo.writeMicroseconds(1800);
-  }
-  else
-  {
-    f->servo.writeMicroseconds(2000);
-  }
-}
 
 void print(String s)
 {
