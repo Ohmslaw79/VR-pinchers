@@ -46,7 +46,7 @@ void read_POT(int POT, finger *f){
     if(f->POS_diff > 1000){
         f->servo.writeMicroseconds(1800);
     }else{
-        f->servo.writeMicroseconds(2000);
+        f->servo.writeMicroseconds(000);
     }
 }
 
