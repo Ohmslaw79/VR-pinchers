@@ -48,14 +48,5 @@
 #define EEPROM_RSTC 7A
 #define EEPROM_FRSGAIN_MSB 7B
 #define EEPROM_FRSGAIN_LSB 7C
-class DS2780{
-    private:
-        int pin_no;
-        
-    public:
-        DS2780(int pin, int)
-
-};
-
 
 #endif /* DS2780_H_ */

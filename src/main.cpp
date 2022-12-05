@@ -49,7 +49,7 @@ void setup()
 
   Serial.begin(115200);
   SerialBT.begin("ESP32test");
-  pinMode(BUTTON, INPUT_PULLUP); // Pull Up Resistance
+  pinMode(BUTTON, INPUT_PULLUP);  // Pull Up Resistance
 
   for (int i = 0; i < finger_num; i++)
   {
@@ -58,66 +58,66 @@ void setup()
   }
 
   Serial.println("ESP32 running :)");
-
 }
+int tog = 0;
+int togLim = 7;
 
-void loop()
-{
+void loop() {
   button_time = millis();
-  if (digitalRead(BUTTON) == LOW && (button_time - last_button_time > DEBOUNCE_TIME))
-  { //*Reset POS if button is pressed (incl. debounce)
-
+  if(digitalRead(BUTTON)  & (button_time - last_button_time > 200)){ //*Reset POS if button is pressed (incl. debounce)
+    
     Serial.println("Position Reset");
+    SerialBT.println("Position Reset");
 
-    for (int i = 0; i < finger_num; i++)
-    {
-      finger_mem[i]->POS_base = analogRead(POT[i]);
+
+    for(int i = 0; i < finger_num; i++){
+      finger_mem[i]->POS_base = analogRead(POT[i]);    
       finger_mem[i]->POS_diff = 0;
       finger_mem[i]->servo.writeMicroseconds(2000);
 
+   
       Serial << i << ":" << finger_mem[i]->POS_diff;
       Serial.println();
       SerialBT << i << ":" << finger_mem[i]->POS_diff;
+    
+      
+      
     }
 
     reset_flag = 1;
 
     delay(1000);
     last_button_time = button_time;
-  }
-  else
-  {
+    
+  }else{
 
     tog++;
-    for (int i = 0; i < finger_num; i++)
-    {
+    for(int i = 0; i < finger_num; i++){
 
-      if (tog % togLim == 0)
-      {
+      if(tog%togLim == 0  ){
         read_POT(POT[i], finger_mem[i]);
         Serial << i << ":" << finger_mem[i]->POS_diff;
         Serial.println();
         SerialBT << i << ":" << finger_mem[i]->POS_diff;
         SerialBT.println();
-        tog = 0;
+        tog = 0; 
       }
+
     }
   }
 
   //* Bluetooth stuff
-  if (Serial.available())
-  {
+  if (Serial.available()) {
     SerialBT.write(Serial.read());
     // for(int i = 0; i < finger_num; i++){
-    // SerialBT.write(i + ":" + finger_mem[i]->POS_diff);
+      // SerialBT.write(i + ":" + finger_mem[i]->POS_diff);
     // }
     // Serial.println();
     reset_flag = 0;
   }
 
   // Recieve where to stop
-  if (SerialBT.available())
-  {
+  if (SerialBT.available()) {
     Serial.write(SerialBT.read());
   }
 
