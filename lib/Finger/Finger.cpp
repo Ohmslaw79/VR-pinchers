@@ -17,7 +17,7 @@ int Finger::get_finger_pos()
 }
 void Finger::set_finger_stop(int stop_pos)
 {
-    servo.writeMicroseconds(SERVO_ZERO + (10 * stop_pos));
+    servo.writeMicroseconds(SERVO_ZERO - (12 * stop_pos));
 }
 void Finger::set_bounds(int _zero, int _max)
 {
@@ -46,9 +46,9 @@ void Finger::calibrate()
 }
 
 void Finger::wiggle_servo(){
-    servo.writeMicroseconds(1000);
+    servo.writeMicroseconds(SERVO_ZERO);
     delay(1000);
-    servo.writeMicroseconds(3000);
-    delay(1000);
-    servo.writeMicroseconds(1000);
+    servo.writeMicroseconds(SERVO_MAX);
+    delay(1500);
+    servo.writeMicroseconds(SERVO_ZERO);
 }

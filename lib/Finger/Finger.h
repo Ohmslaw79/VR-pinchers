@@ -3,7 +3,8 @@
 
 #include <servo.h>
 
-#define SERVO_ZERO 1000
+#define SERVO_ZERO 2000
+#define SERVO_MAX 800
 
 class Finger{
     private:
