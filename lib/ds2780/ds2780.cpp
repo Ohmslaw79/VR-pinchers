@@ -15,7 +15,10 @@ void DS2780::init()
     bus.skip();
 }
 
-DS2780::DS2780(int pin) : bus(pin) {}
+DS2780::DS2780(int pin, int _battery_capacity) : bus(pin)
+{
+    battery_capacity = _battery_capacity;
+}
 
 int DS2780::get_battery_percentage()
 {

@@ -66,18 +66,27 @@ class DS2780
 {
 private:
     OneWire bus;
-    uint8_t* buf = new uint8_t(8);
+    uint8_t *buf = new uint8_t(8);
     uint8_t get_status();
+    uint8_t charge_voltage;
+    uint8_t active_empty_voltage;
+    uint8_t min_charge_current;
+    int battery_capacity;
     void init();
 
 public:
-    DS2780(int pin);
+    DS2780(int pin, int _battery_capacity);
     int get_battery_percentage();
     float get_battery_voltage();
     float get_battery_current();
     uint64_t get_net_address();
     String get_formatted_status();
     bool set_rsns(uint8_t rsns_ohms);
+    bool set_charge_voltage(float voltage);         // TODO - Finish set charge voltage function
+    bool set_active_empty_voltage(float voltage);   // TODO - Finish set active empty voltage function
+    bool set_min_charge_current(float min_current); // TODO - Finish set min charge current function
+    bool set_eeprom_parameters();                   // TODO - Finish set eeprom parameters function
+    bool check_eeprom_parameters();                 // TODO - finish check eeprom parameters function
 };
 
 #endif /* DS2780_H_ */
