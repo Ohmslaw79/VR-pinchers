@@ -3,7 +3,7 @@
 #include <Servo.h>
 #include <iostream>
 #include "Finger.h"
-
+#include "DS2780.h"
 
 #if !defined(CONFIG_BT_ENABLED) || !defined(CONFIG_BLUEDROID_ENABLED)
 #error Bluetooth is not enabled! Please run `make menuconfig` to and enable it
@@ -76,7 +76,7 @@ void loop()
     delay(100);
   }
 
-  // Recieve where to stop
+  // Receive where to stop
   if (SerialBT.available())
   {
     String data = SerialBT.readStringUntil('\n');
