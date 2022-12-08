@@ -82,8 +82,9 @@ String DS2780::get_formatted_status()
 
 bool DS2780::set_rsns(uint8_t rsns_ohms)
 {
+    //Final Units 1/rsns ohms
     init();
-    uint8_t rsnsp = 1 / rsns_ohms;
+    rsnsp = 1 / rsns_ohms;
     buf[0] = CMD_WRITE;
     buf[1] = EEPROM_RSNSP;
     buf[2] = rsnsp;
@@ -99,5 +100,46 @@ bool DS2780::set_rsns(uint8_t rsns_ohms)
         bus.write_bytes(buf, 2);
         return true;
     }
+    return false;
+}
+
+void DS2780::set_charge_voltage(float voltage)
+{
+    //Final Units 19.52mV (1 byte)
+
+    return false;
+}
+
+void DS2780::set_active_empty_voltage(float voltage)
+{
+    //Final Units 19.52mV (1 byte)
+
+    return false;
+}
+
+void DS2780::set_active_empty_current(float current)
+{
+    //Units 200 uV (IAE * rsns)
+}
+
+void DS2780::set_min_charge_current(float min_current)
+{
+    //Final units 50uV (IMIN * RSNS) (1 byte)
+
+    return false;
+}
+
+void DS2780::set_aging_capacity(int battery_capcity_mah)
+{
+    //Final units 6.25uVh (2 bytes)
+}
+
+bool DS2780::set_eeprom_parameters()
+{
+    return false;
+}
+
+bool DS2780::check_eeprom_parameters()
+{
     return false;
 }

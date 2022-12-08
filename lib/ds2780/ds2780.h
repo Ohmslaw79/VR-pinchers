@@ -71,6 +71,8 @@ private:
     uint8_t charge_voltage;
     uint8_t active_empty_voltage;
     uint8_t min_charge_current;
+    uint8_t rsnsp;
+    uint16_t aging_capacity;
     int battery_capacity;
     void init();
 
@@ -82,9 +84,11 @@ public:
     uint64_t get_net_address();
     String get_formatted_status();
     bool set_rsns(uint8_t rsns_ohms);
-    bool set_charge_voltage(float voltage);         // TODO - Finish set charge voltage function
-    bool set_active_empty_voltage(float voltage);   // TODO - Finish set active empty voltage function
-    bool set_min_charge_current(float min_current); // TODO - Finish set min charge current function
+    void set_charge_voltage(float voltage);         // TODO - Finish set charge voltage function
+    void set_active_empty_voltage(float voltage);   // TODO - Finish set active empty voltage function
+    void set_active_empty_current(float current);
+    void set_min_charge_current(float min_current); // TODO - Finish set min charge current function
+    void set_aging_capacity(int battery_capcity_mah); //TODO - Finish set_againg_capacity fucntion
     bool set_eeprom_parameters();                   // TODO - Finish set eeprom parameters function
     bool check_eeprom_parameters();                 // TODO - finish check eeprom parameters function
 };
