@@ -15,6 +15,39 @@ void DS2780::init()
     bus.skip();
 }
 
+bool DS2780::check_eeprom_value(uint8_t address, uint8_t value)
+{
+    // Load value from EEPROM to memory
+    init();
+    buf[0] = CMD_RECALL;
+    buf[1] = address;
+    bus.write_bytes(buf, 2);
+    // Read values from memory
+    init();
+    buf[0] = CMD_READ;
+    bus.write_bytes(buf, 2);
+    bus.read_bytes(&buf[2], 2);
+
+    return value == buf[2];
+}
+
+bool DS2780::write_eeprom_value(uint8_t address, uint8_t value)
+{
+    if (!check_eeprom_value(address, value))
+    {
+        init();
+        buf[0] = CMD_WRITE;
+        buf[1] = address;
+        buf[2] = value;
+        bus.write_bytes(buf, 3);
+
+        init();
+        buf[0] = CMD_COPY;
+        bus.write_bytes(buf, 2);
+    }
+    return check_eeprom_value(address, value);
+}
+
 DS2780::DS2780(int pin, int _battery_capacity) : bus(pin)
 {
     battery_capacity = _battery_capacity;
@@ -73,73 +106,47 @@ uint64_t DS2780::get_net_address()
 String DS2780::get_formatted_status()
 {
     uint8_t status = get_status();
-    return (String)"Charge Terminated: " + (String)((bool) (status & 0x1)) + \
-        (String)"\n Active Empty:      " + (String)((bool) (status & 0x2)) + \
-        (String)"\n Standby Empty:     " + (String)((bool) (status & 0x3)) + \
-        (String)"\n Learning:          " + (String)((bool) (status & 0x4)) + \
-        (String)"\n UnderVoltage:      " + (String)((bool) (status & 0x6));
+    return (String) "Charge Terminated: " + (String)((bool)(status & 0x01)) +
+           (String) "\n Active Empty:      " + (String)((bool)(status & 0x02)) +
+           (String) "\n Standby Empty:     " + (String)((bool)(status & 0x04)) +
+           (String) "\n Learning:          " + (String)((bool)(status & 0x08)) +
+           (String) "\n UnderVoltage:      " + (String)((bool)(status & 0x20));
 }
 
-bool DS2780::set_rsns(uint8_t rsns_ohms)
+bool DS2780::set_rsns(float rsns_ohms)
 {
-    //Final Units 1/rsns ohms
-    init();
-    rsnsp = 1 / rsns_ohms;
-    buf[0] = CMD_WRITE;
-    buf[1] = EEPROM_RSNSP;
-    buf[2] = rsnsp;
-    bus.write_bytes(buf, 3);
-
-    buf[0] = CMD_READ;
-    bus.write_bytes(buf, 2);
-
-    if (bus.read() == rsnsp)
-    {
-        buf[0] = CMD_COPY;
-        buf[1] = EEPROM_RSNSP;
-        bus.write_bytes(buf, 2);
-        return true;
-    }
-    return false;
+    // Final Units 1/rsns ohms
+    return write_eeprom_value(EEPROM_RSNSP, 1 / rsns_ohms);
 }
 
-void DS2780::set_charge_voltage(float voltage)
+bool DS2780::set_charge_voltage(float voltage_v)
 {
-    //Final Units 19.52mV (1 byte)
-
-    return false;
+    // Final Units 19.52mV (1 byte)
+    return write_eeprom_value(EEPROM_VCHG, voltage_v * (1000 / 19.52));
 }
 
-void DS2780::set_active_empty_voltage(float voltage)
+bool DS2780::set_active_empty_voltage(float voltage_v)
 {
-    //Final Units 19.52mV (1 byte)
-
-    return false;
+    // Final Units 19.52mV (1 byte)
+    return write_eeprom_value(EEPROM_VAE, voltage_v * (1000 / 19.52));
 }
 
-void DS2780::set_active_empty_current(float current)
+bool DS2780::set_active_empty_current(float current_mA)
 {
-    //Units 200 uV (IAE * rsns)
+    // Units 200 uV (IAE * rsns)
+    return write_eeprom_value(EEPROM_IAE, current_mA * (1000 / 200));
 }
 
-void DS2780::set_min_charge_current(float min_current)
+bool DS2780::set_min_charge_current(float min_current_mA)
 {
-    //Final units 50uV (IMIN * RSNS) (1 byte)
-
-    return false;
+    // Final units 50uV (IMIN * RSNS) (1 byte)
+    return write_eeprom_value(EEPROM_IMIN, min_current_mA * (1000 / 50));
 }
 
-void DS2780::set_aging_capacity(int battery_capcity_mah)
+bool DS2780::set_aging_capacity(int battery_capacity_mah, float rsns_ohms)
 {
-    //Final units 6.25uVh (2 bytes)
-}
-
-bool DS2780::set_eeprom_parameters()
-{
-    return false;
-}
-
-bool DS2780::check_eeprom_parameters()
-{
-    return false;
+    // Final units 6.25uVh (2 bytes)
+    uint16_t aging_capacity = battery_capacity_mah * rsns_ohms * 1000;
+    return write_eeprom_value(EEPROM_AC_LSB, (uint8_t)aging_capacity) &&
+           write_eeprom_value(EEPROM_AC_LSB, (uint8_t)(aging_capacity >> 8));
 }

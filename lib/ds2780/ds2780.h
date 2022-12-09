@@ -68,13 +68,10 @@ private:
     OneWire bus;
     uint8_t *buf = new uint8_t(8);
     uint8_t get_status();
-    uint8_t charge_voltage;
-    uint8_t active_empty_voltage;
-    uint8_t min_charge_current;
-    uint8_t rsnsp;
-    uint16_t aging_capacity;
     int battery_capacity;
     void init();
+    bool check_eeprom_value(uint8_t address, uint8_t value);
+    bool write_eeprom_value(uint8_t address, uint8_t value);
 
 public:
     DS2780(int pin, int _battery_capacity);
@@ -83,14 +80,12 @@ public:
     float get_battery_current();
     uint64_t get_net_address();
     String get_formatted_status();
-    bool set_rsns(uint8_t rsns_ohms);
-    void set_charge_voltage(float voltage);         // TODO - Finish set charge voltage function
-    void set_active_empty_voltage(float voltage);   // TODO - Finish set active empty voltage function
-    void set_active_empty_current(float current);
-    void set_min_charge_current(float min_current); // TODO - Finish set min charge current function
-    void set_aging_capacity(int battery_capcity_mah); //TODO - Finish set_againg_capacity fucntion
-    bool set_eeprom_parameters();                   // TODO - Finish set eeprom parameters function
-    bool check_eeprom_parameters();                 // TODO - finish check eeprom parameters function
+    bool set_rsns(float rsns_ohms);
+    bool set_charge_voltage(float voltage);
+    bool set_active_empty_voltage(float voltage);
+    bool set_active_empty_current(float current);
+    bool set_min_charge_current(float min_current);
+    bool set_aging_capacity(int battery_capacity_mah, float rsns_ohms);
 };
 
 #endif /* DS2780_H_ */
