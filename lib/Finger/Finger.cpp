@@ -30,7 +30,7 @@ void Finger::calibrate()
     pot_zero = analogRead(pot_pin);
     pot_max = analogRead(pot_pin);
 
-    for (int i = 0; i < 250; i++)
+    for (int i = 0; i < 200; i++)
     {
         int pos = analogRead(pot_pin);
         if (pos < pot_zero)
@@ -47,8 +47,8 @@ void Finger::calibrate()
 
 void Finger::wiggle_servo(){
     servo.writeMicroseconds(SERVO_ZERO);
-    delay(1000);
+    delay(250);
     servo.writeMicroseconds(SERVO_MAX);
-    delay(1500);
+    delay(1000);
     servo.writeMicroseconds(SERVO_ZERO);
 }
